@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kaamwala — Agentic AI Service Discovery & Orchestrator</title>
+  <meta name="description" content="Kaamwala: Real-time agentic orchestrator connecting informal economy providers with customers using multilingual NLP, 7-factor matching, and live stress testing simulators.">
+  
+  <!-- Premium Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Leaflet Map CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body>
+
+  <!-- Background Decorative Glowing Blobs -->
+  <div class="glow-orb orb-1"></div>
+  <div class="glow-orb orb-2"></div>
+  <div class="glow-orb orb-3"></div>
+
+  <!-- Header Banner -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand">
+        <div class="logo-icon">K</div>
+        <div class="brand-text">
+          <h1>Kaamwala</h1>
+          <span class="sub-brand">AI Service Discovery & Orchestration Engine</span>
+        </div>
+      </div>
+      
+      <!-- System Stats Bar -->
+      <div class="header-stats">
+        <div class="stat-badge tooltip" data-tooltip="Total requests processed by the orchestrator">
+          <span class="dot pulse-green"></span>
+          <span>Orchestrator: <strong id="stat-state">Active</strong></span>
+        </div>
+        <div class="stat-badge">
+          <span>Active Providers: <strong id="stat-active-providers">18</strong></span>
+        </div>
+        <div class="stat-badge">
+          <span>Match Confidence: <strong id="stat-avg-confidence">96%</strong></span>
+        </div>
+        <button id="btn-reset-app" class="btn-secondary" title="Reset all simulators to default state">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+          Reset Engine
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Three-Pane Dashboard Layout -->
+  <main class="dashboard-grid">
+
+    <!-- COLUMN 1: Customer Phone Simulator -->
+    <section class="pane-column" aria-label="Customer App Simulator">
+      <div class="phone-frame customer-theme">
+        <!-- Phone Camera Notch / Dynamic Island -->
+        <div class="dynamic-island">
+          <div class="island-camera"></div>
+          <div class="island-sensor"></div>
+        </div>
+        
+        <!-- Phone Screen -->
+        <div class="phone-screen">
+          <!-- Status Bar -->
+          <div class="screen-status-bar">
+            <span class="time" id="customer-phone-time">18:40</span>
+            <div class="status-icons">
+              <svg viewBox="0 0 24 24" class="status-icon"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.13 19.64 10.53 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 15c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg>
+              <svg viewBox="0 0 24 24" class="status-icon"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+              <span class="battery">98%</span>
+            </div>
+          </div>
+          
+          <!-- App Header -->
+          <div class="app-header-bar">
+            <div class="user-avatar-group">
+              <div class="avatar customer-avatar">👤</div>
+              <div class="user-info">
+                <h3>Kaamwala Client</h3>
+                <span class="online-indicator"><span class="dot-online"></span>Online</span>
+              </div>
+            </div>
+            <div class="app-actions">
+              <!-- Quick Language Switcher -->
+              <select id="select-customer-lang" class="language-dropdown" aria-label="Select Language">
+                <option value="mix">Urdu-English</option>
+                <option value="roman">Roman Urdu</option>
+                <option value="en">English Only</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- App Body / Content -->
+          <div class="app-body-container">
+            <!-- Interactive Leaflet Map Overlay (Toggled when job is accepted/active) -->
+            <div id="customer-map-container" class="map-view hide">
+              <div id="leaflet-map" style="width: 100%; height: 100%; background: #1b202c;"></div>
+              <span class="map-hud-eta">ETA: <span id="map-eta-val">12 mins</span></span>
+            </div>
+
+            <!-- Chat & Prompts Box -->
+            <div class="chat-scroller" id="customer-chat-scroller">
+              <div class="chat-message bot-msg">
+                <div class="msg-bubble">
+                  Assalam-o-Alaikum! Main Kaamwala AI Assistant hoon. 🌟
+                  <br><br>
+                  Aapko aaj kis kisam ki madad chahiye? Aap Roman Urdu ya English me likh sakte hain ya niche diye gye buttons par click kar sakte hain!
+                </div>
+              </div>
+              
+              <!-- Chat logs append here -->
+            </div>
+
+            <!-- Quick Action Prompts (Chips) -->
+            <div class="quick-chips-wrapper" id="customer-quick-chips">
+              <button class="chip-btn" data-query="AC thanda nahi kar raha, jaldi bheinjo kisi ko.">❄️ AC Repair</button>
+              <button class="chip-btn" data-query="Kitchen ka sink leak ho raha hai paani bahar aa rha.">🚰 Plumber Needed</button>
+              <button class="chip-btn" data-query="Bache ko Math parhana hai, class 8 ka tutor chahiye online ya home.">📚 Math Tutor</button>
+              <button class="chip-btn" data-query="Gari start nahi ho rahi, battery dead lagti hai.">🚗 Car Mechanic</button>
+              <button class="chip-btn" data-query="Ghar ki safai karwani hai, kitchen aur deep cleaning.">🧹 House Cleaning</button>
+            </div>
+            
+            <!-- Customer Rating Prompt Overlay -->
+            <div id="customer-rating-overlay" class="overlay-card hide">
+              <div class="rating-box glass">
+                <h4>Kaam Mukammal Ho Gya! 🎉</h4>
+                <p>Please rate <strong id="rating-provider-name">Arshad Mahmood</strong>'s service:</p>
+                <div class="stars-row">
+                  <span class="star-btn" data-rating="1">★</span>
+                  <span class="star-btn" data-rating="2">★</span>
+                  <span class="star-btn" data-rating="3">★</span>
+                  <span class="star-btn" data-rating="4">★</span>
+                  <span class="star-btn" data-rating="5">★</span>
+                </div>
+                <textarea id="rating-comment" placeholder="Apna feedback likhain (Optional)..." class="rating-text"></textarea>
+                <button id="btn-submit-rating" class="btn-primary full-width">Submit Feedback</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- App Bottom Input Bar -->
+          <div class="app-input-bar">
+            <!-- Simulated Audio Mic Icon -->
+            <button id="btn-voice-input" class="mic-btn tooltip-top" data-tooltip="Simulate Speech Input (Roman Urdu)">
+              <svg viewBox="0 0 24 24" class="icon-mic"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.42 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></svg>
+            </button>
+            
+            <input type="text" id="customer-message-input" placeholder="Type in Roman Urdu/English..." aria-label="Customer message">
+            
+            <button id="btn-send-message" class="send-btn" aria-label="Send message">
+              <svg viewBox="0 0 24 24" class="icon-send"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COLUMN 2: Provider Phone Simulator -->
+    <section class="pane-column" aria-label="Provider App Simulator">
+      <div class="phone-frame provider-theme">
+        <!-- Phone Camera Notch / Dynamic Island -->
+        <div class="dynamic-island">
+          <div class="island-camera"></div>
+          <div class="island-sensor"></div>
+        </div>
+        
+        <!-- Phone Screen -->
+        <div class="phone-screen">
+          <!-- Status Bar -->
+          <div class="screen-status-bar">
+            <span class="time" id="provider-phone-time">18:40</span>
+            <div class="status-icons">
+              <svg viewBox="0 0 24 24" class="status-icon"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.13 19.64 10.53 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 15c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg>
+              <span class="battery">89%</span>
+            </div>
+          </div>
+          
+          <!-- App Header -->
+          <div class="app-header-bar">
+            <div class="user-avatar-group">
+              <div class="avatar provider-avatar" id="prov-header-avatar">🛠️</div>
+              <div class="user-info">
+                <h3 id="prov-header-name">Kaamwala Partner</h3>
+                <span id="prov-header-status" class="online-indicator offline"><span class="dot-online"></span>Offline</span>
+              </div>
+            </div>
+            <div class="earnings-quick-badge">
+              <span class="badge-label">Today's Earnings</span>
+              <span class="badge-val" id="prov-earnings-badge">PKR 0</span>
+            </div>
+          </div>
+
+          <!-- App Body -->
+          <div class="app-body-container" id="provider-app-body">
+            
+            <!-- STATE A: Offline / Waiting Screen -->
+            <div id="prov-state-offline" class="prov-screen-state">
+              <div class="offline-hero">
+                <div class="radar-circle">
+                  <div class="radar-ping"></div>
+                  <div class="radar-core">🔌</div>
+                </div>
+                <h3>Aap Offline Hain</h3>
+                <p>Naye kaam ki alerts hasil karne ke liye online ho jain.</p>
+                <button id="btn-go-online" class="btn-primary">Go Online</button>
+              </div>
+            </div>
+
+            <!-- STATE B: Online / Searching Screen -->
+            <div id="prov-state-searching" class="prov-screen-state hide">
+              <div class="searching-hero">
+                <div class="radar-circle scanning">
+                  <div class="radar-ping"></div>
+                  <div class="radar-core">🔍</div>
+                </div>
+                <h3>Scanning for Jobs...</h3>
+                <p>Islamabad high-demand zones me matching orders dhoond rahe hain.</p>
+                <button id="btn-go-offline" class="btn-secondary">Go Offline</button>
+              </div>
+            </div>
+
+            <!-- STATE C: Alert Bid Received Screen -->
+            <div id="prov-state-alert" class="prov-screen-state hide">
+              <div class="alert-card glass animate-bounce-alert">
+                <div class="alert-banner">NEW REQUEST DISPATCHED!</div>
+                <div class="alert-timer-ring">
+                  <span id="alert-countdown">15</span>s
+                </div>
+                
+                <div class="alert-details">
+                  <div class="detail-row">
+                    <span class="lbl">Customer Location</span>
+                    <span class="val" id="alert-cust-loc">G-11, Islamabad</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="lbl">Required Service</span>
+                    <span class="val highlight" id="alert-service-type">AC Leak Repair</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="lbl">Estimated Pay</span>
+                    <span class="val price-val" id="alert-est-pay">PKR 2,400</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="lbl">Est. Distance</span>
+                    <span class="val" id="alert-distance">2.4 km (8 mins travel)</span>
+                  </div>
+                </div>
+
+                <div class="alert-action-buttons">
+                  <button id="btn-decline-job" class="btn-danger flex-grow">Decline</button>
+                  <button id="btn-accept-job" class="btn-success flex-grow">Accept Job</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- STATE D: Active Job Tracker Screen -->
+            <div id="prov-state-active" class="prov-screen-state hide">
+              <div class="active-job-card">
+                <div class="job-status-pill inline-badge orange-badge" id="job-progress-badge">EN-ROUTE TO CUSTOMER</div>
+                
+                <div class="active-client-bar">
+                  <div class="avatar">👤</div>
+                  <div class="client-info">
+                    <h4 id="active-client-name">Shaikh Sb</h4>
+                    <p id="active-client-phone">+92 300 5550192</p>
+                  </div>
+                  <button class="call-btn-mock" title="Call Customer">📞</button>
+                </div>
+
+                <!-- Navigation Simulation Visual -->
+                <div class="map-hud-navigation">
+                  <span class="nav-text">🚗 <strong>Drive to destination:</strong> Head South toward G-11 Markaz</span>
+                  <div class="progress-bar-container">
+                    <div class="progress-fill" id="job-journey-progress" style="width: 20%;"></div>
+                  </div>
+                  <span class="nav-eta" id="job-hud-eta">Remaining: 6 mins (1.8 km)</span>
+                </div>
+
+                <!-- Interactive Task Checklist -->
+                <div class="provider-checklist-box">
+                  <h4>Service Checklist</h4>
+                  <ul class="checklist-items" id="prov-checklist-ul">
+                    <li><label><input type="checkbox" disabled> Arrive at site</label></li>
+                    <li><label><input type="checkbox" disabled> Inspect issues & show estimate</label></li>
+                    <li><label><input type="checkbox" disabled> Perform repair operations</label></li>
+                    <li><label><input type="checkbox" disabled> Clean workspace & take photo proof</label></li>
+                  </ul>
+                </div>
+
+                <!-- Action Triggers -->
+                <div class="job-controls">
+                  <button id="btn-prov-action" class="btn-primary full-width">Arrived at Location</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COLUMN 3: Antigravity AI Orchestrator & Stress Control Center -->
+    <section class="pane-column main-orchestrator-pane" aria-label="Antigravity Control Center">
+      <div class="console-box glass">
+        
+        <!-- Live Terminal logs and matching analytics tabs -->
+        <div class="console-tabs">
+          <button class="tab-btn active" data-tab="tab-nlp-matcher">🎯 Matcher & NLP</button>
+          <button class="tab-btn" data-tab="tab-weights">⚙️ Match Weights</button>
+          <button class="tab-btn" data-tab="tab-logs">📟 Orchestrator Logs</button>
+          <button class="tab-btn" data-tab="tab-stress">🌪️ Stress Testing</button>
+        </div>
+
+        <div class="console-content">
+
+          <!-- TAB A: Matcher & NLP Analyzer -->
+          <div id="tab-nlp-matcher" class="tab-panel active">
+            <!-- Part A1: Multilingual NLP Parser HUD -->
+            <div class="hud-panel nlp-parser-hud">
+              <h3>Multilingual NLP Parser</h3>
+              <div class="nlp-grid">
+                <div class="nlp-card">
+                  <span class="hud-lbl">Detected Intent</span>
+                  <div class="hud-val-container">
+                    <span class="hud-val highlight" id="nlp-intent">---</span>
+                  </div>
+                </div>
+                <div class="nlp-card">
+                  <span class="hud-lbl">Extracted Urgency</span>
+                  <div class="hud-val-container">
+                    <span class="hud-val inline-badge" id="nlp-urgency">---</span>
+                  </div>
+                </div>
+                <div class="nlp-card">
+                  <span class="hud-lbl">Confidence Score</span>
+                  <div class="hud-val-container">
+                    <div class="progress-bar-container inline-progress">
+                      <div class="progress-fill" id="nlp-confidence-bar" style="width: 0%;"></div>
+                    </div>
+                    <span id="nlp-confidence-val">0%</span>
+                  </div>
+                </div>
+                <div class="nlp-card">
+                  <span class="hud-lbl">Identified Location</span>
+                  <div class="hud-val-container">
+                    <span class="hud-val" id="nlp-extracted-location">---</span>
+                  </div>
+                </div>
+              </div>
+              <div class="translation-flow-box">
+                <div class="translation-node">
+                  <span class="lbl">Raw Input:</span>
+                  <p id="nlp-raw-input" class="raw-italic">"Waiting for request..."</p>
+                </div>
+                <div class="translation-node arrow">➡️</div>
+                <div class="translation-node">
+                  <span class="lbl">AI Translation (English Standard):</span>
+                  <p id="nlp-clean-translation" class="clean-translation">"None"</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Part A2: Matchmaking Leaderboard Grid -->
+            <div class="hud-panel leaderboard-hud">
+              <div class="hud-header">
+                <h3>7-Factor Matchmaking Grid</h3>
+                <span class="math-formula">Score = ∑(Weight_i × Factor_i)</span>
+              </div>
+              <div class="table-responsive">
+                <table class="leaderboard-table">
+                  <thead>
+                    <tr>
+                      <th>Rank</th>
+                      <th>Provider</th>
+                      <th>Service</th>
+                      <th>Rating (S_a)</th>
+                      <th>Dist (S_d)</th>
+                      <th>Rel (S_r)</th>
+                      <th>Cancel (S_c)</th>
+                      <th>Exp (S_e)</th>
+                      <th>Total Score</th>
+                    </tr>
+                  </thead>
+                  <tbody id="matchmaking-leaderboard-tbody">
+                    <tr>
+                      <td colspan="9" class="text-center">Engine idle. Type or select a quick chip in the Client App.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Part A3: Pricing Breakdowns -->
+            <div class="hud-panel pricing-hud">
+              <h3>Dynamic Pricing & Route Diagnostics</h3>
+              <div class="pricing-flex">
+                <div class="pricing-receipt glass">
+                  <h4>Itemized Invoice Breakdown</h4>
+                  <div class="invoice-lines" id="invoice-details">
+                    <div class="inv-line"><span>Base Service Charge</span><span class="right">PKR 0</span></div>
+                    <div class="inv-line"><span>Distance Travel Buffer</span><span class="right">PKR 0</span></div>
+                    <div class="inv-line"><span>Urgency/Surge Multiplier</span><span class="right">1.0x</span></div>
+                    <div class="inv-line total-line"><span>Final Estimated Quote</span><span class="right">PKR 0</span></div>
+                  </div>
+                </div>
+                <div class="analytics-gauge-box">
+                  <div class="gauge-card">
+                    <span class="gauge-lbl">Capacity Load</span>
+                    <span class="gauge-val" id="gauge-capacity-val">34%</span>
+                    <div class="gauge-bar"><div class="gauge-fill pulse-blue" id="gauge-capacity-fill" style="width: 34%;"></div></div>
+                  </div>
+                  <div class="gauge-card">
+                    <span class="gauge-lbl">Surge State</span>
+                    <span class="gauge-val inline-badge green-badge" id="gauge-surge-val">REGULAR</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB B: Engine Weight Tuner -->
+          <div id="tab-weights" class="tab-panel">
+            <div class="hud-panel weight-tuner-panel">
+              <h3>Real-Time Engine Match Weights</h3>
+              <p class="section-desc">Adjust the 7-Factor sliders to modify how the AI orchestrator ranks and matches service providers in real-time.</p>
+              
+              <div class="weights-sliders-grid">
+                <div class="slider-group">
+                  <label for="weight-distance">
+                    <span>🚗 Distance Score (W_d)</span>
+                    <strong id="val-w-distance">0.25</strong>
+                  </label>
+                  <input type="range" id="weight-distance" min="0" max="1" step="0.05" value="0.25">
+                </div>
+                
+                <div class="slider-group">
+                  <label for="weight-specialization">
+                    <span>🎯 Skill Specialization (W_s)</span>
+                    <strong id="val-w-specialization">0.20</strong>
+                  </label>
+                  <input type="range" id="weight-specialization" min="0" max="1" step="0.05" value="0.20">
+                </div>
+
+                <div class="slider-group">
+                  <label for="weight-reliability">
+                    <span>⏰ On-Time Reliability (W_r)</span>
+                    <strong id="val-w-reliability">0.15</strong>
+                  </label>
+                  <input type="range" id="weight-reliability" min="0" max="1" step="0.05" value="0.15">
+                </div>
+
+                <div class="slider-group">
+                  <label for="weight-price">
+                    <span>💰 Price Compatibility (W_p)</span>
+                    <strong id="val-w-price">0.10</strong>
+                  </label>
+                  <input type="range" id="weight-price" min="0" max="1" step="0.05" value="0.10">
+                </div>
+
+                <div class="slider-group">
+                  <label for="weight-cancel">
+                    <span>❌ Cancellation Rate (W_c)</span>
+                    <strong id="val-w-cancel">0.10</strong>
+                  </label>
+                  <input type="range" id="weight-cancel" min="0" max="1" step="0.05" value="0.10">
+                </div>
+
+                <div class="slider-group">
+                  <label for="weight-rating">
+                    <span>⭐ Historical Rating (W_a)</span>
+                    <strong id="val-w-rating">0.12</strong>
+                  </label>
+                  <input type="range" id="weight-rating" min="0" max="1" step="0.05" value="0.12">
+                </div>
+
+                <div class="slider-group">
+                  <label for="weight-experience">
+                    <span>🎓 Exp / Certs (W_e)</span>
+                    <strong id="val-w-experience">0.08</strong>
+                  </label>
+                  <input type="range" id="weight-experience" min="0" max="1" step="0.05" value="0.08">
+                </div>
+              </div>
+              
+              <div class="weight-controls-row">
+                <span class="warning-text" id="weight-sum-warning">Weights Sum: 1.00</span>
+                <button id="btn-reset-weights" class="btn-secondary">Reset to Default</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB C: Orchestrator Logs & Sheet Sync -->
+          <div id="tab-logs" class="tab-panel">
+            <div class="hud-panel logs-pane">
+              <div class="logs-header">
+                <h3>Live Orchestrator Trace Log</h3>
+                <button id="btn-clear-logs" class="btn-clear-terminal">Clear Terminal</button>
+              </div>
+              <div class="terminal-shell" id="console-terminal">
+                <div class="terminal-line system"><span class="prompt">AntigravityOS v2.0:</span> Loading modules...</div>
+                <div class="terminal-line system"><span class="prompt">AntigravityOS v2.0:</span> Preseeded 18 providers across 9 categories.</div>
+                <div class="terminal-line system"><span class="prompt">AntigravityOS v2.0:</span> NLP Lexicon engine running. Ready for incoming requests.</div>
+              </div>
+            </div>
+            
+            <div class="hud-panel database-sync-hud">
+              <h3>Database & Google Sheet Real-time Sync</h3>
+              <div class="sync-grid">
+                <div class="sync-element">
+                  <div class="sync-icon database">🗄️</div>
+                  <div class="sync-desc">
+                    <span>Primary Database State</span>
+                    <strong id="sync-db-status">Synced (18 Records)</strong>
+                  </div>
+                </div>
+                <div class="sync-element">
+                  <div class="sync-icon spreadsheet">📊</div>
+                  <div class="sync-desc">
+                    <span>Google Sheets Integration</span>
+                    <strong id="sync-sheet-status">Active (Live Streamed)</strong>
+                  </div>
+                </div>
+              </div>
+              <div class="sheet-rows-simulator">
+                <h4>Simulated Google Sheet Logs (Last 3 updates)</h4>
+                <ul class="sheet-log-lines" id="sheet-log-ul">
+                  <li class="sheet-row-loading">Waiting for workflow triggers...</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB D: Dynamic Stress Testing Center -->
+          <div id="tab-stress" class="tab-panel">
+            <div class="hud-panel stress-tuner-panel">
+              <h3>Simulate Corner Cases & Real-world Chaos</h3>
+              <p class="section-desc">Test how the Kaamwala AI Engine gracefully handles critical failures, surge spikes, language variations, and structural cancellations.</p>
+              
+              <div class="stress-grid">
+                
+                <!-- Card 1 -->
+                <div class="stress-card">
+                  <h4>🌪️ Mid-Job Provider Cancellation</h4>
+                  <p>Triggers provider cancellation when en-route, testing automatic re-matching system triggers without user re-entry.</p>
+                  <button id="stress-btn-cancel" class="btn-danger full-width" disabled>Trigger Cancel Event</button>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="stress-card">
+                  <h4>⚡ Peak Rush-Hour Congestion</h4>
+                  <p>Artificially spike city-wide demand. Triples base fares, triggers capacity alerts, and changes distance routing variables.</p>
+                  <button id="stress-btn-rush" class="btn-warning full-width">Simulate Surge Peak</button>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="stress-card">
+                  <h4>❌ No Suitable Providers</h4>
+                  <p>Artificially lock all service provider columns. Tests system's elegant queue buffer state and notification retry intervals.</p>
+                  <button id="stress-btn-noproviders" class="btn-secondary full-width">Lock All Providers</button>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="stress-card">
+                  <h4>🗣️ Multilingual Chaos Injector</h4>
+                  <p>Feeds extremely code-switched phrases (Urdu + Roman Urdu + slang) to evaluate lexicon robustness.</p>
+                  <button id="stress-btn-slang" class="btn-primary full-width">Inject Code-Switch</button>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Premium Notification Toast System -->
+  <div id="toast-container" class="toast-stack"></div>
+
+  <!-- Audio elements for interactive bells (optional mock audio synthesized in JS) -->
+
+  <!-- Leaflet Map JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Include Javascript files -->
+  <script src="app.js"></script>
+</body>
+</html>
